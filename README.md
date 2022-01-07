@@ -1,2 +1,2 @@
-# pokedex
-Pokemon wiki sourced from pokeapi.co
+# Pokédex
+Pokémon wiki sourced from [pokeapi.co](https://pokeapi.co)
