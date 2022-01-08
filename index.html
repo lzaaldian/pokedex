@@ -7,6 +7,16 @@
   <title>Pokédex - Pokémon wiki from pokeapi.co</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <style>
+    .padding-small {
+      padding: 0.25rem;
+    }
+
+    .card-content__details {
+      margin-top: 2rem !important;
+      margin-bottom: 0 !important;
+    }
+  </style>
 </head>
 
 <body>
@@ -30,7 +40,7 @@
       <div class="card-image"></div>
       <div class="card-title"></div>
       <div class="card-badges"></div>
-      <div class="card-content__details"></div>
+      <div class="card-content__details collection"></div>
     </div>
     <div class="card-action">
       <a href="#!" class="modal-close">Close</a>
@@ -62,7 +72,7 @@
        * =======================================================================
        */
 
-      $(document).on('click', '.collection-item', function(event) {
+      $(document).on('click', '.modal-trigger', function(event) {
         let dataAttributes = $(this).data()
         let pokemonDetails = $('.card-content__details')
 
@@ -77,12 +87,12 @@
             $('.card-image').html(`<img src="${response.sprites.other['official-artwork'].front_default}">`)
 
             response.types.forEach(function (item) {
-              $(`<span class="badge grey lighten-2">${item.type.name}</span>`).appendTo('.card-badges')
+              $(`<span class="padding-small grey lighten-2">${item.type.name}</span>`).appendTo('.card-badges')
             })
 
-            let content = ``
-
-            pokemonDetails.html(content)
+            response.stats.forEach(function (item) {
+              $(`<li class="collection-item"><span class="badge">${item.base_stat}</span>${item.stat.name}</li>`).appendTo(pokemonDetails)
+            })
           })
       })
 
