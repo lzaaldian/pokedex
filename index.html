@@ -31,7 +31,7 @@
     $(function() {
       const P = new Pokedex.Pokedex()
 
-      P.getPokemonsList()
+      P.getPokemonsList({offset: 0, limit: 10})
         .then(function(response) {
           response.results.forEach(function (data) {
             let content = `<a href="#!" class="collection-item">${formatName(data.name)}</a>`
