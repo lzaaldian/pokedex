@@ -27,9 +27,9 @@
   <!-- Modal Structure -->
   <div id="modal-detail" class="modal">
     <div class="modal-content">
-      <div class="progress">
-        <div class="indeterminate"></div>
-      </div>
+      <h4 class="modal-header"></h4>
+      
+      <div class="modal-body"></div>
     </div>
     <div class="modal-footer">
       <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
@@ -51,9 +51,7 @@
 
       var instances = M.Modal.init(document.querySelectorAll('.modal'), {
         onCloseEnd: function() {
-          $('.modal-content').empty().html(`<div class="progress">
-              <div class="indeterminate"></div>
-          </div>`)
+          $('.modal-body').empty()
         }
       })
 
@@ -66,8 +64,9 @@
       $(document).on('click', '.collection-item', function(event) {
         let dataAttributes = $(this).data()
 
-        let content = `<h4>${formatName(dataAttributes.name)}</h4>`
-        $('.modal-content').empty().html(content)
+        $('.modal-header').text(formatName(dataAttributes.name))
+
+        $('.modal-body').html(`<div class="progress"><div class="indeterminate"></div></div>`)
       })
 
       /**
