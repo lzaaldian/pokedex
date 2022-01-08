@@ -51,7 +51,7 @@
 
       var instances = M.Modal.init(document.querySelectorAll('.modal'), {
         onCloseEnd: function() {
-          $('.modal-body').empty()
+          $('.modal-body, .modal-header').empty()
         }
       })
 
