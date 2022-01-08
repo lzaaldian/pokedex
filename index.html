@@ -13,20 +13,38 @@
   <div class="container">
     <div class="row">
       <div class="col s12">
-        <h1>Pokédex</h1>
+        <div class="collection" id="pokemon-list"></div>
       </div>
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cash/8.1.0/cash.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   <script src="https://unpkg.com/pokeapi-js-wrapper/dist/index.js"></script>
   <script>
-    const P = new Pokedex.Pokedex()
+    $(function() {
+      const P = new Pokedex.Pokedex()
 
-    P.getPokemonByName("eevee")
-      .then(function(response) {
-        console.log(response)
-      })
+      P.getPokemonsList()
+        .then(function(response) {
+          response.results.forEach(function (data) {
+            let content = `<a href="#!" class="collection-item">${formatName(data.name)}</a>`
+            $(content).appendTo('#pokemon-list')
+          });
+        })
+
+      /**
+       * Format Pokemon name
+       * - capitalize first letter for Pokemon with single word name
+       * 
+       * @param   {String}  word  Pokémon name
+       *
+       * @return  {String}        Easy to read Pokémon name
+       */
+      function formatName(word) {
+        return word.charAt(0).toUpperCase() + word.slice(1)
+      }
+    })
   </script>
 </body>
 
