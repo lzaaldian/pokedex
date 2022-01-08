@@ -19,8 +19,20 @@
 
     <div class="row">
       <div class="col s12">
-        <div class="collection" id="pokemon-list"></div>
+        <ul class="collection" id="pokemon-list"></ul>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal Structure -->
+  <div id="modal-detail" class="modal">
+    <div class="modal-content">
+      <div class="progress">
+        <div class="indeterminate"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
     </div>
   </div>
 
@@ -29,15 +41,54 @@
   <script src="https://unpkg.com/pokeapi-js-wrapper/dist/index.js"></script>
   <script>
     $(function() {
+      /**
+       * =======================================================================
+       *  Initialize libraries
+       * =======================================================================
+       */
+
       const P = new Pokedex.Pokedex()
 
-      P.getPokemonsList({offset: 0, limit: 10})
+      var instances = M.Modal.init(document.querySelectorAll('.modal'), {
+        onCloseEnd: function() {
+          $('.modal-content').empty().html(`<div class="progress">
+              <div class="indeterminate"></div>
+          </div>`)
+        }
+      })
+
+      /**
+       * =======================================================================
+       *  Register event listeners so  AJAX generated content can be activated
+       * =======================================================================
+       */
+
+      $(document).on('click', '.collection-item', function(event) {
+        let dataAttributes = $(this).data()
+
+        let content = `<h4>${formatName(dataAttributes.name)}</h4>`
+        $('.modal-content').empty().html(content)
+      })
+
+      /**
+       * =======================================================================
+       *  Start functionalities
+       * =======================================================================
+       */
+
+      P.getPokemonsList({ offset: 0, limit: 10 })
         .then(function(response) {
-          response.results.forEach(function (data) {
-            let content = `<a href="#!" class="collection-item">${formatName(data.name)} <div class="secondary-content"><i class="material-icons">chevron_right</i></div></a>`
+          response.results.forEach(function(data) {
+            let content = `<li class="collection-item modal-trigger" data-name="${data.name}" data-target="modal-detail"><div>${formatName(data.name)}<a href="#!" class="secondary-content"><i class="material-icons">chevron_right</i></a></div></li>`
             $(content).appendTo('#pokemon-list')
           });
         })
+
+      /**
+       * =======================================================================
+       *  Functions
+       * =======================================================================
+       */
 
       /**
        * Format Pokemon name
