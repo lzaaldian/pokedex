@@ -29,6 +29,7 @@
     <div class="card-content">
       <div class="card-image"></div>
       <div class="card-title"></div>
+      <div class="card-badges"></div>
       <div class="card-content__details"></div>
     </div>
     <div class="card-action">
@@ -51,7 +52,7 @@
 
       var instances = M.Modal.init(document.querySelectorAll('.modal'), {
         onCloseEnd: function() {
-          $('.card-image, .card-title, .card-content__details').empty()
+          $('.card-image, .card-title, .card-badges, .card-content__details').empty()
         }
       })
 
@@ -74,8 +75,13 @@
             pokemonDetails.empty()
 
             $('.card-image').html(`<img src="${response.sprites.other['official-artwork'].front_default}">`)
+
+            response.types.forEach(function (item) {
+              $(`<span class="badge grey lighten-2">${item.type.name}</span>`).appendTo('.card-badges')
+            })
+
             let content = ``
-            
+
             pokemonDetails.html(content)
           })
       })
