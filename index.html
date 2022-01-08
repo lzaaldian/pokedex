@@ -27,6 +27,7 @@
   <!-- Modal Structure -->
   <div id="modal-detail" class="modal card">
     <div class="card-content">
+      <div class="card-image"></div>
       <div class="card-title"></div>
       <div class="card-content__details"></div>
     </div>
@@ -50,7 +51,7 @@
 
       var instances = M.Modal.init(document.querySelectorAll('.modal'), {
         onCloseEnd: function() {
-          $('.card-title, .card-content__details').empty()
+          $('.card-image, .card-title, .card-content__details').empty()
         }
       })
 
@@ -62,10 +63,21 @@
 
       $(document).on('click', '.collection-item', function(event) {
         let dataAttributes = $(this).data()
+        let pokemonDetails = $('.card-content__details')
 
         $('.card-title').text(formatName(dataAttributes.name))
 
-        $('.card-content__details').html(`<div class="progress"><div class="indeterminate"></div></div>`)
+        pokemonDetails.html(`<div class="progress"><div class="indeterminate"></div></div>`)
+
+        P.getPokemonByName(dataAttributes.name)
+          .then(function (response) {
+            pokemonDetails.empty()
+
+            $('.card-image').html(`<img src="${response.sprites.other['official-artwork'].front_default}">`)
+            let content = ``
+            
+            pokemonDetails.html(content)
+          })
       })
 
       /**
