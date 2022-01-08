@@ -1,1 +1,209 @@
-<h1>Hello!</h1>
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pokédex - Pokémon wiki from pokeapi.co</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <style>
+    .padding-small {
+      padding: 0.25rem;
+    }
+
+    .card-content__details {
+      margin-top: 2rem !important;
+      margin-bottom: 0 !important;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col s12">
+        <h1>Pokémon List</h1>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col s12">
+        <ul class="collection" id="pokemon-list">
+          <div class="progress">
+            <div class="indeterminate"></div>
+          </div>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col s12">
+        <ul class="pagination">
+          <li class="disabled" data-pagination="prev"><a href="#!">Prev</a></li>
+          <li class="waves-effect" data-pagination="next"><a href="#!">Next</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Structure -->
+  <div id="modal-detail" class="modal card">
+    <div class="card-content">
+      <div class="card-image"></div>
+      <div class="card-title"></div>
+      <div class="card-badges"></div>
+      <div class="card-content__details collection"></div>
+    </div>
+    <div class="card-action">
+      <a href="#!" class="modal-close">Close</a>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cash/8.1.0/cash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script src="https://unpkg.com/pokeapi-js-wrapper/dist/index.js"></script>
+  <script>
+    $(function() {
+      /**
+       * =======================================================================
+       *  Initialize libraries
+       * =======================================================================
+       */
+
+      const pokemonList = $('#pokemon-list')
+
+      var paginationOffset = 0
+      const paginationPrev = $('.pagination>li[data-pagination="prev"]')
+      const preloaderDOM = `<div class="progress"><div class="indeterminate"></div></div>`
+
+      const P = new Pokedex.Pokedex()
+
+      var instances = M.Modal.init(document.querySelectorAll('.modal'), {
+        onCloseEnd: function() {
+          $('.card-image, .card-title, .card-badges, .card-content__details').empty()
+        }
+      })
+
+      /**
+       * =======================================================================
+       *  Register event listeners so  AJAX generated content can be activated
+       * =======================================================================
+       */
+
+      $(document).on('click', '.modal-trigger', function(event) {
+        let dataAttributes = $(this).data()
+        let pokemonDetails = $('.card-content__details')
+
+        $('.card-title').text(formatName(dataAttributes.name))
+
+        pokemonDetails.html(preloaderDOM)
+
+        P.getPokemonByName(dataAttributes.name)
+          .then(function(response) {
+            pokemonDetails.empty()
+
+            $('.card-image').html(`<img src="${response.sprites.other['official-artwork'].front_default}">`)
+
+            response.types.forEach(function(item) {
+              $(`<span class="padding-small grey lighten-2">${item.type.name}</span>`).appendTo('.card-badges')
+            })
+
+            response.stats.forEach(function(item) {
+              $(`<li class="collection-item"><span class="badge">${item.base_stat}</span>${item.stat.name}</li>`).appendTo(pokemonDetails)
+            })
+          })
+      })
+
+      $('.pagination>li').on('click', function() {
+        const paginationLink = $(this)
+        const pagination = paginationLink.data()['pagination']
+
+        calculatePaginationOffset(pagination)
+
+        pokemonList.empty().html(preloaderDOM)
+
+        P.getPokemonsList({
+          offset: paginationOffset,
+          limit: 10
+        })
+          .then(function(response) {
+            pokemonList.empty()
+
+            response.results.forEach(function(data) {
+              let content = `<li class="collection-item modal-trigger" data-name="${data.name}" data-target="modal-detail">
+                <div>${formatName(data.name)}<a href="#!" class="secondary-content"><i class="material-icons">chevron_right</i></a></div>
+              </li>`
+              $(content).appendTo(pokemonList)
+            });
+
+            if (paginationOffset === 0) {
+              paginationPrev.removeClass('waves-effect')
+              paginationPrev.addClass('disabled')
+            } else {
+              paginationPrev.removeClass('disabled')
+              paginationPrev.addClass('waves-effect')
+            }
+          })
+      })
+
+      /**
+       * =======================================================================
+       *  Start functionalities
+       * =======================================================================
+       */
+
+      P.getPokemonsList({ offset: 0, limit: 10 })
+        .then(function(response) {
+          pokemonList.empty()
+
+          response.results.forEach(function(data) {
+            let content = `<li class="collection-item modal-trigger" data-name="${data.name}" data-target="modal-detail">
+              <div>${formatName(data.name)}<a href="#!" class="secondary-content"><i class="material-icons">chevron_right</i></a></div>
+            </li>`
+            $(content).appendTo(pokemonList)
+          });
+        })
+
+      /**
+       * =======================================================================
+       *  Functions
+       * =======================================================================
+       */
+
+      /**
+       * Format Pokemon name
+       * - capitalize first letter for Pokemon with single word name
+       * 
+       * @param   {String}  word  Pokémon name
+       *
+       * @return  {String}        Easy to read Pokémon name
+       */
+      function formatName(word) {
+        return word.charAt(0).toUpperCase() + word.slice(1)
+      }
+
+      /**
+       * Calculate pagination offset
+       *
+       * @param   {String}  pagination  Pagination destination
+       */
+      function calculatePaginationOffset(pagination) {
+        if (pagination === 'next') {
+          paginationOffset += 10
+        } else {
+          if (paginationOffset > 0) {
+            offset = paginationOffset -= 10
+          }
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>
