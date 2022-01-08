@@ -19,6 +19,15 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script src="https://unpkg.com/pokeapi-js-wrapper/dist/index.js"></script>
+  <script>
+    const P = new Pokedex.Pokedex()
+
+    P.getPokemonByName("eevee")
+      .then(function(response) {
+        console.log(response)
+      })
+  </script>
 </body>
 
 </html>
